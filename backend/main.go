@@ -25,7 +25,6 @@ func main(){
 	// routes
 	routes.RegisterRoutes(server)
 
-
 	// fetch port and run server
 	PORT := os.Getenv("PORT")
 	if PORT == ""{
