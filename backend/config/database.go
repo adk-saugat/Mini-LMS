@@ -7,8 +7,8 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-var connection *pgx.Conn
-var dbCtx context.Context
+var Connection *pgx.Conn
+var DbCtx context.Context
 
 func InitializeDatabase(){
 	// get connection string
@@ -18,14 +18,13 @@ func InitializeDatabase(){
 	}
 
 	// connect to database
-	dbCtx = context.Background()
+	DbCtx = context.Background()
 
 	var err error
-	connection, err = pgx.Connect(dbCtx, connString)
+	Connection, err = pgx.Connect(DbCtx, connString)
 	if err != nil {
 		panic("unable to connect to database")
 	}
-	defer connection.Close(dbCtx)
 
 
 	createTables()
@@ -33,19 +32,19 @@ func InitializeDatabase(){
 
 func createTables(){
 	query := `
-		CREATE TABLE User (
-			id SERIAL PRIMARY KEY
-			firstName TEXT NOT NULL
-			lastName TEXT NOT NULL
-			email TEXT NOT NULL UNIQUE
-			password TEXT NOT NULL
-			role TEXT CHECK (role IN ('instructor', 'student')) NOT NULL
-			createdAt TIMESTAMP DEFAULT NOW()
+		CREATE TABLE IF NOT EXISTS "User" (
+			id SERIAL PRIMARY KEY,
+			"firstName" TEXT NOT NULL,
+			"lastName" TEXT NOT NULL,
+			email TEXT NOT NULL UNIQUE,
+			password TEXT NOT NULL,
+			role TEXT CHECK (role IN ('instructor', 'student')) NOT NULL,
+			"createdAt" TIMESTAMP DEFAULT NOW()
 		)
 	`
 
-	_, err := connection.Exec(dbCtx, query)
+	_, err := Connection.Exec(DbCtx, query)
 	if err != nil {
-		panic("couldnot create table")
+		panic("could not create table: ")
 	}
 }
