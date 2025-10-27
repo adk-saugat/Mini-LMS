@@ -14,7 +14,7 @@ func RegisterUser(ctx *gin.Context){
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Couldnot parse request data!"})
 		return
 	}
-
+	
 	err = user.Register()
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Couldnot register user!"})

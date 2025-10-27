@@ -1,10 +1,12 @@
 package models
 
 import (
+	"errors"
 	"fmt"
 	"time"
 
 	"github.com/adk-saugat/mini-lms/config"
+	"github.com/adk-saugat/mini-lms/utils"
 )
 
 type User struct{
@@ -24,7 +26,12 @@ func (user *User) Register() error{
 		RETURNING id;
 	`
 
-	err := config.Connection.QueryRow(config.DbCtx, query, user.FirstName, user.LastName, user.Email, user.Password, user.Role).Scan(&user.ID)
+	hashedPassword, err := utils.HashPassword(user.Password)
+	if err != nil {
+		return errors.New("couldnot hash password")
+	}
+
+	err = config.Connection.QueryRow(config.DbCtx, query, user.FirstName, user.LastName, user.Email, hashedPassword, user.Role).Scan(&user.ID)
 	if err != nil {
 		fmt.Printf("Database error: %v\n", err)
 		return err
