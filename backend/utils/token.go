@@ -17,3 +17,7 @@ func GenerateToken(userId int64, email string) (string, error){
 
 	return token.SignedString([]byte(jwtSecret))
 }
+
+func VerifyToken(token string) (int64, error){
+	return 0, nil
+}

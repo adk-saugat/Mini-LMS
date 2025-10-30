@@ -23,9 +23,6 @@ func RegisterUser(ctx *gin.Context){
 		return
 	}
 
-	// Clear password before sending response
-	user.Password = ""
-
 	ctx.JSON(http.StatusCreated, gin.H{"message": "User registered successfully!", "user": user})
 }
 
@@ -53,5 +50,9 @@ func LoginUser(ctx *gin.Context){
 		"message": "Login Successful!",
 		"token": token,
 	})
+
+}
+
+func GetUserProfile(ctx *gin.Context){
 
 }
