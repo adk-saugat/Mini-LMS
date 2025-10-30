@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"errors"
 	"os"
 	"time"
 
@@ -19,5 +20,32 @@ func GenerateToken(userId int64, email string) (string, error){
 }
 
 func VerifyToken(token string) (int64, error){
-	return 0, nil
+	parsedToken, err := jwt.Parse(token, func(t *jwt.Token) (any, error) {
+		_, ok := t.Method.(*jwt.SigningMethodHMAC)
+		if !ok{
+			return nil, errors.New("unexpected signing method")
+		}
+		return []byte(os.Getenv("JWT_SECRET")), nil
+	})
+
+	if err != nil {
+		return 0, errors.New("couldnot parse token")
+	}
+
+	tokenIsValid := parsedToken.Valid
+	if !tokenIsValid{
+		return 0, errors.New("invalid token")
+	}
+
+	claims, ok := parsedToken.Claims.(jwt.MapClaims)
+	if !ok {
+		return 0, errors.New("invalid token claims")
+	}
+
+	userIdFloat, ok := claims["userId"].(float64)
+	if !ok {
+		return 0, errors.New("userId not found in token claims")
+	}
+	return int64(userIdFloat), nil
+
 }

@@ -59,3 +59,21 @@ func (user *User) ValidateCredential() error{
 
 	return nil
 }
+
+func GetUserById(userId int64) (*User, error){
+	query := `
+		SELECT id, "firstName", "lastName", email, role, "createdAt"
+		FROM "User"
+		WHERE id = $1;
+	`
+
+	row := config.Connection.QueryRow(config.DbCtx, query, userId)
+	
+	var user User
+	err := row.Scan(&user.ID, &user.FirstName, &user.LastName, &user.Email, &user.Role, &user.CreatedAt)
+	if err != nil {
+		return nil, err
+	}
+
+	return &user, nil
+}
