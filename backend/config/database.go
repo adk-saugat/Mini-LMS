@@ -45,6 +45,22 @@ func createTables(){
 
 	_, err := Connection.Exec(DbCtx, query)
 	if err != nil {
-		panic("could not create table: ")
+		panic("could not create table")
+	}
+
+	query = `
+		CREATE TABLE IF NOT EXISTS Course (
+			id SERIAL PRIMARY KEY,
+			"instructorId" INTEGER NOT NULL,
+			title TEXT NOT NULL,
+			description VARCHAR(255) NOT NULL,
+			category TEXT NOT NULL,
+			"createdAt" TIMESTAMP DEFAULT NOW()
+		)
+	`
+
+	_, err = Connection.Exec(DbCtx, query)
+	if err != nil {
+		panic("could not create table")
 	}
 }

@@ -39,7 +39,7 @@ func (user *User) Register() error{
 
 func (user *User) ValidateCredential() error{
 	query := `
-		SELECT id, password
+		SELECT id, password, role
 		FROM "User"
 		WHERE email = $1
 	`
@@ -47,7 +47,7 @@ func (user *User) ValidateCredential() error{
 	row := config.Connection.QueryRow(config.DbCtx, query, user.Email)
 
 	var retrievedPassword string
-	err := row.Scan(&user.ID, &retrievedPassword)
+	err := row.Scan(&user.ID, &retrievedPassword, &user.Role)
 	if err != nil {
 		return err
 	}

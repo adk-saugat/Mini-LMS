@@ -13,6 +13,7 @@ func RegisterRoutes(server *gin.Engine){
 		ctx.JSON(http.StatusOK, gin.H{"message": "pong"})
 	})
 
+	// auth routes
 	server.POST("/auth/register", handlers.RegisterUser)
 	server.POST("/auth/login", handlers.LoginUser)
 
@@ -20,4 +21,16 @@ func RegisterRoutes(server *gin.Engine){
 	authenticate.Use(middleware.Authenticate)
 
 	authenticate.GET("/auth/me", handlers.GetUserProfile)
+
+	// general course routes (accessible to authenticated users)
+	// Add routes like GET /courses, GET /courses/:id here when needed:
+	// courseRoutes := authenticate.Group("/courses")
+	// courseRoutes.GET("/", handlers.GetAllCourses)
+	// courseRoutes.GET("/:id", handlers.GetCourseById)
+
+	// instructor-only course routes
+	instructorRoutes := authenticate.Group("/courses")
+	instructorRoutes.Use(middleware.CheckInstructor)
+	instructorRoutes.POST("/", handlers.CreateCourse)
+	// TODO: Add other instructor routes like PUT /courses/:id, DELETE /courses/:id
 }

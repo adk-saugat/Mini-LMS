@@ -8,18 +8,19 @@ import (
 	"github.com/golang-jwt/jwt"
 )
 
-func GenerateToken(userId int64, email string) (string, error){
+func GenerateToken(userId int64, email string, role string) (string, error){
 	jwtSecret := os.Getenv("JWT_SECRET")
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"userId" : userId,
 		"email": email,
+		"role": role,
 		"exp": time.Now().Add(time.Hour * 2).Unix(),
 	})
 
 	return token.SignedString([]byte(jwtSecret))
 }
 
-func VerifyToken(token string) (int64, error){
+func VerifyToken(token string) (int64, string, error){
 	parsedToken, err := jwt.Parse(token, func(t *jwt.Token) (any, error) {
 		_, ok := t.Method.(*jwt.SigningMethodHMAC)
 		if !ok{
@@ -29,23 +30,28 @@ func VerifyToken(token string) (int64, error){
 	})
 
 	if err != nil {
-		return 0, errors.New("couldnot parse token")
+		return 0, "", errors.New("couldnot parse token")
 	}
 
 	tokenIsValid := parsedToken.Valid
 	if !tokenIsValid{
-		return 0, errors.New("invalid token")
+		return 0, "", errors.New("invalid token")
 	}
 
 	claims, ok := parsedToken.Claims.(jwt.MapClaims)
 	if !ok {
-		return 0, errors.New("invalid token claims")
+		return 0, "", errors.New("invalid token claims")
 	}
 
 	userIdFloat, ok := claims["userId"].(float64)
 	if !ok {
-		return 0, errors.New("userId not found in token claims")
+		return 0, "", errors.New("userId not found in token claims")
 	}
-	return int64(userIdFloat), nil
 
+	userRole, ok := claims["role"].(string)
+	if !ok {
+		return 0, "", errors.New("userRole not found in token claims")
+	}
+
+	return int64(userIdFloat),userRole, nil
 }
