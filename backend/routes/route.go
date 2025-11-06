@@ -17,21 +17,18 @@ func RegisterRoutes(server *gin.Engine){
 	server.POST("/auth/register", handlers.RegisterUser)
 	server.POST("/auth/login", handlers.LoginUser)
 
+	// general routes to everyone
+	server.GET("/courses", handlers.GetCourses)
+
 	authenticate := server.Group("/")
 	authenticate.Use(middleware.Authenticate)
 
 	authenticate.GET("/auth/me", handlers.GetUserProfile)
 
-	// general course routes (accessible to authenticated users)
-	// Add routes like GET /courses, GET /courses/:id here when needed:
-	// courseRoutes := authenticate.Group("/courses")
-	// courseRoutes.GET("/", handlers.GetAllCourses)
-	// courseRoutes.GET("/:id", handlers.GetCourseById)
-
 	// instructor-only course routes
 	instructorRoutes := authenticate.Group("/courses")
 	instructorRoutes.Use(middleware.CheckInstructor)
-	
+
 	instructorRoutes.POST("/", handlers.CreateCourse)
 
 }

@@ -7,6 +7,20 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+func GetCourses(ctx *gin.Context){
+	courses, err := models.FetchAllCourses()
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"error": "Couldnot parse request data!", 
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"courses": courses,
+	})
+}
+
 func CreateCourse(ctx *gin.Context){
 	var course models.Course
 	instructorId := ctx.GetInt64("userId")

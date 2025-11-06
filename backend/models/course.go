@@ -15,6 +15,29 @@ type Course struct{
 	CreatedAt	 	time.Time 	`json:"createdAt"`
 }
 
+func FetchAllCourses() ([]Course, error){
+	query := `
+		SELECT * FROM Course
+	`
+
+	rows, err := config.Connection.Query(config.DbCtx, query)
+	if err != nil {
+		return nil, err
+	}
+	
+	var courses []Course
+	for rows.Next() {
+		var course Course
+		err = rows.Scan(&course.ID, &course.InstructorId, &course.Title, &course.Description, &course.Category, &course.CreatedAt)
+		if err != nil {
+			return nil, err
+		}
+		courses = append(courses, course)
+	}
+
+	return courses, nil
+}
+
 func (course *Course) CreateCourse() error{
 	query := `
 		INSERT INTO Course ("instructorId", title, description, category)
