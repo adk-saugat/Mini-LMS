@@ -40,7 +40,7 @@ func createTables(){
 			password TEXT NOT NULL,
 			role TEXT CHECK (role IN ('instructor', 'student')) NOT NULL,
 			"createdAt" TIMESTAMP DEFAULT NOW()
-		)
+		) 
 	`
 
 	_, err := Connection.Exec(DbCtx, query)
@@ -53,8 +53,8 @@ func createTables(){
 			id SERIAL PRIMARY KEY,
 			"instructorId" INTEGER NOT NULL,
 			title TEXT NOT NULL,
-			description VARCHAR(255) NOT NULL,
-			category TEXT NOT NULL,
+			description VARCHAR(255),
+			category TEXT,
 			"createdAt" TIMESTAMP DEFAULT NOW()
 		)
 	`

@@ -1,3 +1,9 @@
 POST http://localhost:8080/courses
 Content-Type: application/json
-Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxvbkBnbWFpbC5jb20iLCJleHAiOjE3NjIyODI4MzQsInJvbGUiOiJpbnN0cnVjdG9yIiwidXNlcklkIjoxMX0.d2v_9drZTvkAhq9i12Xe5RD123LycFj8GcOoFwfko4k
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxvbkBnbWFpbC5jb20iLCJleHAiOjE3NjI0NTI1OTIsInJvbGUiOiJpbnN0cnVjdG9yIiwidXNlcklkIjoxMX0.oj8UB6vBKolYbYLdvti0uLgRIJebOnAyhEftBa4b2K4
+
+{
+    "title": "Learn React",
+    "description": "A great learning platform to excel on react!",
+    "category": "computer science"
+}
