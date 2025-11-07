@@ -8,6 +8,31 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+func DeleteCourse(ctx *gin.Context) {
+	courseIdStr := ctx.Param("courseId")
+	courseId, err := strconv.ParseInt(courseIdStr, 10, 64)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"error": "Could not parse parameters!",
+		})
+		return
+	}
+
+	instructorId := ctx.GetInt64("userId")
+
+	err = models.DeleteCourse(courseId, instructorId)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Could not delete course!",
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"message": "Course deleted successfully!",
+	})
+}
+
 func GetCourses(ctx *gin.Context) {
 	page, err := strconv.ParseInt(ctx.DefaultQuery("page", "1"), 10, 64)
 	if err != nil {
@@ -19,8 +44,8 @@ func GetCourses(ctx *gin.Context) {
 
 	courses, err := models.FetchAllCourses(page)
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"error": "Couldnot parse request data!", 
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Couldnot fetch courses!", 
 		})
 		return
 	}

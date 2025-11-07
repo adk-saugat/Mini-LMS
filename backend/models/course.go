@@ -15,6 +15,19 @@ type Course struct{
 	CreatedAt	 	time.Time 	`json:"createdAt"`
 }
 
+func DeleteCourse(courseId, instructorId int64) (error){
+	query := `
+		DELETE FROM Course
+		WHERE id = $1 AND "instructorId" = $2
+	`
+
+	_, err := config.Connection.Exec(config.DbCtx, query, courseId, instructorId)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func FetchAllCourses(pageNumber int64) ([]Course, error){
 	offset := (pageNumber - 1) * 2
 	query := `
