@@ -2,13 +2,22 @@ package handlers
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/adk-saugat/mini-lms/models"
 	"github.com/gin-gonic/gin"
 )
 
-func GetCourses(ctx *gin.Context){
-	courses, err := models.FetchAllCourses()
+func GetCourses(ctx *gin.Context) {
+	page, err := strconv.ParseInt(ctx.DefaultQuery("page", "1"), 10, 64)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"error": "Couldnot parse query values!", 
+		})
+		return
+	}
+
+	courses, err := models.FetchAllCourses(page)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"error": "Couldnot parse request data!", 
@@ -18,6 +27,7 @@ func GetCourses(ctx *gin.Context){
 
 	ctx.JSON(http.StatusOK, gin.H{
 		"courses": courses,
+		"page": page,
 	})
 }
 

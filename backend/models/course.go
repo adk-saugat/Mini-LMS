@@ -15,12 +15,16 @@ type Course struct{
 	CreatedAt	 	time.Time 	`json:"createdAt"`
 }
 
-func FetchAllCourses() ([]Course, error){
+func FetchAllCourses(pageNumber int64) ([]Course, error){
+	offset := (pageNumber - 1) * 2
 	query := `
 		SELECT * FROM Course
+		ORDER BY id
+		LIMIT 2
+		OFFSET $1
 	`
 
-	rows, err := config.Connection.Query(config.DbCtx, query)
+	rows, err := config.Connection.Query(config.DbCtx, query, offset)
 	if err != nil {
 		return nil, err
 	}
