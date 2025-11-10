@@ -1,9 +1,9 @@
 POST http://localhost:8080/courses
 Content-Type: application/json
-Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxvbkBnbWFpbC5jb20iLCJleHAiOjE3NjI1NDI5NzUsInJvbGUiOiJpbnN0cnVjdG9yIiwidXNlcklkIjoxMX0.vC0J27Cse7E-L-eA5rLc9tVc9y8YO7jgR6IRewBfVh0
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InBhdWxAZ21haWwuY29tIiwiZXhwIjoxNzYyNzk4NjU5LCJyb2xlIjoiaW5zdHJ1Y3RvciIsInVzZXJJZCI6MTJ9.vepz-lp0Pv2tQp0VxME-Mfn6L-RAJNrzEkV9X2RAkOw
 
 {
-    "title": "Physics 101",
-    "description": "Lets learn how to build rockets!",
-    "category": "physics"
+    "title": "Object Oriented Design",
+    "description": "Everything there is to it, I will teach you!",
+    "category": "computer science"
 }

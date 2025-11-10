@@ -22,6 +22,7 @@ func (user *User) Register() error{
 	query := `
 		INSERT INTO "User" ("firstName", "lastName", email, password, role) 
 		VALUES ($1, $2, $3, $4, $5)
+		RETURNING id, "createdAt"
 	`
 
 	hashedPassword, err := utils.HashPassword(user.Password)
@@ -29,7 +30,7 @@ func (user *User) Register() error{
 		return errors.New("couldnot hash password")
 	}
 
-	_, err = config.Connection.Exec(config.DbCtx, query, user.FirstName, user.LastName, user.Email, hashedPassword, user.Role)
+	err = config.Connection.QueryRow(config.DbCtx, query, user.FirstName, user.LastName, user.Email, hashedPassword, user.Role).Scan(&user.ID, &user.CreatedAt)
 	if err != nil {
 		return err
 	}

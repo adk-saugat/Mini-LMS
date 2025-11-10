@@ -23,7 +23,7 @@ func InitializeDatabase(){
 	var err error
 	Connection, err = pgx.Connect(DbCtx, connString)
 	if err != nil {
-		panic("unable to connect to database")
+		panic("unable to connect to database: " + err.Error())
 	}
 
 

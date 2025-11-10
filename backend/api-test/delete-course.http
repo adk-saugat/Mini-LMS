@@ -1,0 +1,2 @@
+DELETE http://localhost:8080/courses/2
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxvbkBnbWFpbC5jb20iLCJleHAiOjE3NjI3OTg1NTYsInJvbGUiOiJpbnN0cnVjdG9yIiwidXNlcklkIjoxMX0.ICEGct6AtJDGezvsBg6komAIVg3t3pcCFVSMeOyDE9A

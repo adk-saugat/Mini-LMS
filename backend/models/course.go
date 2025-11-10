@@ -28,7 +28,24 @@ func DeleteCourse(courseId, instructorId int64) (error){
 	return nil
 }
 
-func FetchAllCourses(pageNumber int64) ([]Course, error){
+func GetCourseById(courseId int64) (*Course, error){
+	query := `
+		SELECT * FROM Course
+		WHERE id = $1
+	`
+
+	row := config.Connection.QueryRow(config.DbCtx, query, courseId)
+
+	var course Course
+	err := row.Scan(&course.ID, &course.InstructorId, &course.Title, &course.Description, &course.Category, &course.CreatedAt)
+	if err != nil {
+		return nil, err
+	}
+
+	return &course, nil
+}
+
+func GetAllCourses(pageNumber int64) ([]Course, error){
 	offset := (pageNumber - 1) * 2
 	query := `
 		SELECT * FROM Course

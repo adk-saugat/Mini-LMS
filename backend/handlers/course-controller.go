@@ -20,6 +20,22 @@ func DeleteCourse(ctx *gin.Context) {
 
 	instructorId := ctx.GetInt64("userId")
 
+	course, err := models.GetCourseById(courseId)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Could fetch course!",
+		})
+		return
+	}
+
+	if course.InstructorId != instructorId {
+		ctx.JSON(http.StatusUnauthorized, gin.H{
+			"error": "Not authorized to delete course!",
+		})
+		return
+	}
+
+
 	err = models.DeleteCourse(courseId, instructorId)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
@@ -33,7 +49,29 @@ func DeleteCourse(ctx *gin.Context) {
 	})
 }
 
-func GetCourses(ctx *gin.Context) {
+func FetchCourse(ctx *gin.Context){
+	courseId, err := strconv.ParseInt(ctx.Param("id"), 10, 64)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"error": "Could not parse parameters!",
+		})
+		return
+	}
+
+	course, err := models.GetCourseById(courseId)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Could fetch course!",
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"course": course,
+	})
+}
+
+func FetchAllCourses(ctx *gin.Context) {
 	page, err := strconv.ParseInt(ctx.DefaultQuery("page", "1"), 10, 64)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
@@ -42,7 +80,7 @@ func GetCourses(ctx *gin.Context) {
 		return
 	}
 
-	courses, err := models.FetchAllCourses(page)
+	courses, err := models.GetAllCourses(page)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Couldnot fetch courses!", 

@@ -18,7 +18,8 @@ func RegisterRoutes(server *gin.Engine){
 	server.POST("/auth/login", handlers.LoginUser)
 
 	// general routes to everyone
-	server.GET("/courses", handlers.GetCourses)
+	server.GET("/courses", handlers.FetchAllCourses)
+	server.GET("/courses/:id", handlers.FetchCourse)
 
 	authenticate := server.Group("/")
 	authenticate.Use(middleware.Authenticate)
@@ -30,5 +31,6 @@ func RegisterRoutes(server *gin.Engine){
 	instructorRoutes.Use(middleware.CheckInstructor)
 
 	instructorRoutes.POST("/", handlers.CreateCourse)
+	// instructorRoutes.PUT("/:courseId", handlers.UpdateCourse)
 	instructorRoutes.DELETE("/:courseId", handlers.DeleteCourse)
 }
