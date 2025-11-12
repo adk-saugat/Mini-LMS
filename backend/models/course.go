@@ -15,6 +15,21 @@ type Course struct{
 	CreatedAt	 	time.Time 	`json:"createdAt"`
 }
 
+func (course *Course) Update() error{
+	query := `
+		UPDATE Course
+		SET title = $1, description = $2, category = $3
+		WHERE id = $4
+	`
+
+	_, err := config.Connection.Exec(config.DbCtx, query, course.Title, course.Description, course.Category, course.ID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func DeleteCourse(courseId, instructorId int64) (error){
 	query := `
 		DELETE FROM Course
@@ -50,7 +65,7 @@ func GetAllCourses(pageNumber int64) ([]Course, error){
 	query := `
 		SELECT * FROM Course
 		ORDER BY id
-		LIMIT 2
+		LIMIT 5
 		OFFSET $1
 	`
 

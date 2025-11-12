@@ -27,10 +27,11 @@ func RegisterRoutes(server *gin.Engine){
 	authenticate.GET("/auth/me", handlers.GetUserProfile)
 
 	// instructor-only course routes
-	instructorRoutes := authenticate.Group("/courses")
+	instructorRoutes := server.Group("/courses")
+	instructorRoutes.Use(middleware.Authenticate)
 	instructorRoutes.Use(middleware.CheckInstructor)
 
 	instructorRoutes.POST("/", handlers.CreateCourse)
-	// instructorRoutes.PUT("/:courseId", handlers.UpdateCourse)
+	instructorRoutes.PUT("/:courseId", handlers.UpdateCourse)
 	instructorRoutes.DELETE("/:courseId", handlers.DeleteCourse)
 }

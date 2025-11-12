@@ -8,6 +8,64 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+func UpdateCourse(ctx *gin.Context) {
+	courseIdStr := ctx.Param("courseId")
+	courseId, err := strconv.ParseInt(courseIdStr, 10, 64)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"error": "Could not parse parameters!",
+		})
+		return
+	}
+
+	instructorId := ctx.GetInt64("userId")
+
+	course, err := models.GetCourseById(courseId)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Could fetch course!",
+		})
+		return
+	}
+
+	if course.InstructorId != instructorId {
+		ctx.JSON(http.StatusUnauthorized, gin.H{
+			"error": "Not authorized to update course!",
+		})
+		return
+	}
+
+	var updatedCourse models.Course
+	err = ctx.ShouldBindJSON(&updatedCourse)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "Couldnot parse request data!"})
+		return
+	}
+	
+	// Merge: use new values if provided, otherwise keep existing values
+	if updatedCourse.Title != "" {
+		course.Title = updatedCourse.Title
+	}
+	if updatedCourse.Description != "" {
+		course.Description = updatedCourse.Description
+	}
+	if updatedCourse.Category != "" {
+		course.Category = updatedCourse.Category
+	}
+	
+	err = course.Update()
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Could not update course!",
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"message": "Course updated successfully!",
+	})
+}
+
 func DeleteCourse(ctx *gin.Context) {
 	courseIdStr := ctx.Param("courseId")
 	courseId, err := strconv.ParseInt(courseIdStr, 10, 64)
