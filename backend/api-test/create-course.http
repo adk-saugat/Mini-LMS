@@ -1,9 +1,9 @@
 POST http://localhost:8080/courses
 Content-Type: application/json
-Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InBhdWxAZ21haWwuY29tIiwiZXhwIjoxNzYyNzk4NjU5LCJyb2xlIjoiaW5zdHJ1Y3RvciIsInVzZXJJZCI6MTJ9.vepz-lp0Pv2tQp0VxME-Mfn6L-RAJNrzEkV9X2RAkOw
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InBhdWxAZ21haWwuY29tIiwiZXhwIjoxNzYzMDU4NTg0LCJyb2xlIjoiaW5zdHJ1Y3RvciIsInVzZXJJZCI6MTJ9.sDhGkAQak0TACyVryfyDDO5mzIch5TrpOtCO-pvYQ6g
 
 {
-    "title": "Object Oriented Design",
-    "description": "Everything there is to it, I will teach you!",
-    "category": "computer science"
+    "title": "Computer Science Basics",
+    "description": "Learn the core concepts of computing — from algorithms to data structures!",
+    "category": "Computer Science"
 }

@@ -61,15 +61,16 @@ func GetCourseById(courseId int64) (*Course, error){
 }
 
 func GetAllCourses(pageNumber int64) ([]Course, error){
-	offset := (pageNumber - 1) * 2
+	limit := int64(6)
+	offset := (pageNumber - 1) * limit
 	query := `
 		SELECT * FROM Course
 		ORDER BY id
-		LIMIT 5
-		OFFSET $1
+		LIMIT $1
+		OFFSET $2
 	`
 
-	rows, err := config.Connection.Query(config.DbCtx, query, offset)
+	rows, err := config.Connection.Query(config.DbCtx, query, limit, offset)
 	if err != nil {
 		return nil, err
 	}
