@@ -240,7 +240,7 @@ function StudentDashboardPage() {
               Discover new courses to expand your knowledge.
             </p>
             <Link
-              to="/courses"
+              to="/dashboard/student/courses"
               className="text-purple-600 hover:text-purple-700 font-medium"
             >
               Explore courses →
@@ -281,7 +281,7 @@ function StudentDashboardPage() {
               You haven't enrolled in any courses yet.
             </p>
             <Link
-              to="/courses"
+              to="/dashboard/student/courses"
               className="inline-block px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
             >
               Browse Courses
