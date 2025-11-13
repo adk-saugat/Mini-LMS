@@ -1,0 +1,7 @@
+PUT http://localhost:8080/courses/4
+Content-Type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxvbkBnbWFpbC5jb20iLCJleHAiOjE3NjI5OTc3NzcsInJvbGUiOiJpbnN0cnVjdG9yIiwidXNlcklkIjoxMX0.7azIH4mAaO_T8OC-XFSTOBpuBlQXNVZNxix8ZF4VgQw
+
+{
+    "title": "Data Structures 101"
+}
