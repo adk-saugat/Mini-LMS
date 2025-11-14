@@ -55,6 +55,7 @@ func LoginUser(ctx *gin.Context){
 	ctx.JSON(http.StatusOK, gin.H{
 		"message": "Login Successful!",
 		"token": token,
+		"role": user.Role,
 	})
 
 }
