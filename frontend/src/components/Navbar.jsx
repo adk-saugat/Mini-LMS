@@ -1,8 +1,17 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { logout } from "../service/auth.js";
 
 function Navbar() {
   const location = useLocation();
-  const isDashboard = location.pathname.includes("/dashboard");
+  const navigate = useNavigate();
+  const isDashboard =
+    location.pathname.includes("/instructor/dashboard") ||
+    location.pathname.includes("/student/dashboard");
+
+  const handleLogout = () => {
+    logout();
+    navigate("/");
+  };
 
   return (
     <nav className="border-b px-6 py-4">
@@ -31,7 +40,10 @@ function Navbar() {
                   />
                 </svg>
               </Link>
-              <button className="flex items-center gap-2 bg-black text-white px-6 py-2 rounded hover:bg-gray-800 cursor-pointer">
+              <button
+                onClick={handleLogout}
+                className="flex items-center gap-2 bg-black text-white px-6 py-2 rounded hover:bg-gray-800 cursor-pointer"
+              >
                 <svg
                   className="w-4 h-4"
                   fill="none"

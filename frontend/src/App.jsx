@@ -4,6 +4,7 @@ import LoginPage from "./routes/LoginPage";
 import RegisterPage from "./routes/RegisterPage";
 import StudentDashboardPage from "./routes/student/StudentDashboardPage";
 import InstructorDashboardPage from "./routes/instructor/InstructorDashboardPage";
+import ProtectedRoute from "./components/ProtectedRoute";
 import "./App.css";
 
 function App() {
@@ -13,13 +14,22 @@ function App() {
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
 
-      {/* Student Routes  */}
-      <Route path="/dashboard/student" element={<StudentDashboardPage />} />
-
-      {/* Instructor Routes  */}
+      {/* Protected Routes */}
       <Route
-        path="/dashboard/instructor"
-        element={<InstructorDashboardPage />}
+        path="/student/dashboard"
+        element={
+          <ProtectedRoute requiredRole="student">
+            <StudentDashboardPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/instructor/dashboard"
+        element={
+          <ProtectedRoute requiredRole="instructor">
+            <InstructorDashboardPage />
+          </ProtectedRoute>
+        }
       />
     </Routes>
   );

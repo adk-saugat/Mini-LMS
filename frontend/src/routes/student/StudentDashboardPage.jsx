@@ -54,22 +54,27 @@ function StudentDashboardPage() {
               <p className="text-gray-600">No courses enrolled yet</p>
             </div>
           ) : (
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {enrolledCourses.map((course) => (
                 <div
                   key={course.id}
-                  className="border border-gray-300 rounded p-6"
+                  className="border border-gray-300 rounded-lg p-4 hover:shadow-md transition-shadow bg-white flex flex-col"
                 >
-                  <h3 className="text-lg font-semibold mb-2">{course.title}</h3>
-                  <p className="text-gray-600 text-sm mb-4">
-                    {course.description}
-                  </p>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-500">
+                  <div className="mb-2">
+                    <span className="inline-block bg-gray-100 text-gray-700 text-xs font-medium px-2 py-1 rounded">
                       {course.category}
                     </span>
-                    <button className="text-black hover:underline text-sm cursor-pointer">
+                  </div>
+                  <h3 className="text-lg font-semibold mb-2 text-gray-900">
+                    {course.title}
+                  </h3>
+                  <p className="text-gray-600 text-sm mb-4 line-clamp-2 flex-grow">
+                    {course.description}
+                  </p>
+                  <div className="flex justify-end mt-auto">
+                    <button className="text-black hover:underline text-sm font-medium cursor-pointer flex items-center gap-1">
                       View Course
+                      <span>→</span>
                     </button>
                   </div>
                 </div>
