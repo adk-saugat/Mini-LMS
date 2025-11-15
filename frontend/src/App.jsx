@@ -1,34 +1,22 @@
-import { Route, Routes } from "react-router-dom";
-import "./App.css";
-
-// Public Pages
+import { Routes, Route } from "react-router-dom";
 import LandingPage from "./routes/LandingPage";
 import LoginPage from "./routes/LoginPage";
 import RegisterPage from "./routes/RegisterPage";
-
-// Student Pages
-import StudentDashboardPage from "./routes/StudentDashboardPage";
-import BrowseCoursesPage from "./routes/BrowseCoursesPage";
-
-// Instructor Pages
-import InstructorDashboardPage from "./routes/InstructorDashboardPage";
+import StudentDashboardPage from "./routes/student/StudentDashboardPage";
+import InstructorDashboardPage from "./routes/instructor/InstructorDashboardPage";
+import "./App.css";
 
 function App() {
   return (
     <Routes>
-      {/* Public Routes */}
       <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
 
-      {/* Student Dashboard Routes */}
+      {/* Student Routes  */}
       <Route path="/dashboard/student" element={<StudentDashboardPage />} />
-      <Route
-        path="/dashboard/student/courses"
-        element={<BrowseCoursesPage />}
-      />
 
-      {/* Instructor Dashboard Routes */}
+      {/* Instructor Routes  */}
       <Route
         path="/dashboard/instructor"
         element={<InstructorDashboardPage />}
