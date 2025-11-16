@@ -39,7 +39,7 @@ function StudentDashboardPage() {
             </p>
           </div>
           <Link
-            to="/courses"
+            to="/student/courses"
             className="bg-black text-white px-6 py-2 rounded hover:bg-gray-800 cursor-pointer"
           >
             Browse Courses
@@ -88,4 +88,3 @@ function StudentDashboardPage() {
 }
 
 export default StudentDashboardPage;
-

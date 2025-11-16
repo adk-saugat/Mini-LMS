@@ -2,6 +2,7 @@ import { Routes, Route } from "react-router-dom";
 import LandingPage from "./routes/LandingPage";
 import LoginPage from "./routes/LoginPage";
 import RegisterPage from "./routes/RegisterPage";
+import BrowseCoursesPage from "./routes/BrowseCoursesPage";
 import StudentDashboardPage from "./routes/student/StudentDashboardPage";
 import InstructorDashboardPage from "./routes/instructor/InstructorDashboardPage";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -13,6 +14,16 @@ function App() {
       <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
+
+      {/* Protected - Student only */}
+      <Route
+        path="/student/courses"
+        element={
+          <ProtectedRoute requiredRole="student">
+            <BrowseCoursesPage />
+          </ProtectedRoute>
+        }
+      />
 
       {/* Protected Routes */}
       <Route
