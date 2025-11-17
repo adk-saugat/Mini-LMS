@@ -31,7 +31,9 @@ func RegisterRoutes(server *gin.Engine){
 	instructorRoutes.Use(middleware.Authenticate)
 	instructorRoutes.Use(middleware.CheckInstructor)
 
-	instructorRoutes.POST("/", handlers.CreateCourse)
+	instructorRoutes.POST("", handlers.CreateCourse)
 	instructorRoutes.PUT("/:courseId", handlers.UpdateCourse)
 	instructorRoutes.DELETE("/:courseId", handlers.DeleteCourse)
+
+	instructorRoutes.POST("/:courseId/lessons", handlers.CreateLesson)
 }

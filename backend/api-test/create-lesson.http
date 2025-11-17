@@ -1,0 +1,8 @@
+POST http://localhost:8080/courses/2/lessons
+Content-Type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImpvaG5AZ21haWwuY29tIiwiZXhwIjoxNzYzNDA0NzM3LCJyb2xlIjoiaW5zdHJ1Y3RvciIsInVzZXJJZCI6MX0.76rxV5qSQr1IawF01zclwsmZVuH8JYhmCO3xtyinmdQ
+
+{
+    "title": "Lesson 1: Introduction to Web Development",
+    "content": "In this lesson, you will learn what web development is, the difference between frontend and backend, and the three core languages of the web: HTML, CSS, and JavaScript. You will also understand how websites are delivered through browsers and how developers structure, style, and add interactivity to web pages."
+}
