@@ -36,4 +36,5 @@ func RegisterRoutes(server *gin.Engine){
 	instructorRoutes.DELETE("/:courseId", handlers.DeleteCourse)
 
 	instructorRoutes.POST("/:courseId/lessons", handlers.CreateLesson)
+	instructorRoutes.GET("/created", handlers.GetAllCourseCreated)
 }

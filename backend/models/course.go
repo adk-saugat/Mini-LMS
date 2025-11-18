@@ -15,6 +15,32 @@ type Course struct{
 	CreatedAt	 	time.Time 	`json:"createdAt"`
 }
 
+
+func GetCreatedCourse(instructorId int64) ([]Course, error){
+	query := `
+		SELECT * FROM Course
+		WHERE "instructorId" = $1
+	`
+
+	rows, err := config.Connection.Query(config.DbCtx, query, instructorId)
+	if err != nil {
+		return nil, err
+	}
+
+	var courses []Course
+	for rows.Next() {
+		var course Course
+		err = rows.Scan(&course.ID, &course.InstructorId, &course.Title, &course.Description, &course.Category, &course.CreatedAt)
+		if err != nil {
+			return nil, err
+		}
+		courses = append(courses, course)
+	}      
+
+	return courses, nil
+
+}
+
 func (course *Course) Update() error{
 	query := `
 		UPDATE Course
@@ -83,7 +109,7 @@ func GetAllCourses(pageNumber int64) ([]Course, error){
 			return nil, err
 		}
 		courses = append(courses, course)
-	}
+	}      
 
 	return courses, nil
 }

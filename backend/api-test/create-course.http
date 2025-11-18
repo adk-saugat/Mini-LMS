@@ -1,6 +1,6 @@
 POST http://localhost:8080/courses
 Content-Type: application/json
-Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InBhdWxAZ21haWwuY29tIiwiZXhwIjoxNzYzMDU4NTg0LCJyb2xlIjoiaW5zdHJ1Y3RvciIsInVzZXJJZCI6MTJ9.sDhGkAQak0TACyVryfyDDO5mzIch5TrpOtCO-pvYQ6g
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxvbkBnbWFpbC5jb20iLCJleHAiOjE3NjM0NDUwMjYsInJvbGUiOiJpbnN0cnVjdG9yIiwidXNlcklkIjozfQ.bKGecPccodv7FFO4Rjn9Jt9fVBC-Dig1E_CYM9MCjCg
 
 {
     "title": "World History 101",
