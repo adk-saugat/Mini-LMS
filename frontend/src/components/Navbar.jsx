@@ -16,10 +16,7 @@ function Navbar() {
   return (
     <nav className="border-b px-6 py-4">
       <div className="flex justify-between items-center">
-        <Link
-          to="/"
-          className="text-2xl font-bold hover:text-gray-600 flex items-center gap-2"
-        >
+        <Link className="text-2xl font-bold flex items-center gap-2">
           <svg
             className="w-8 h-8 text-black"
             fill="none"

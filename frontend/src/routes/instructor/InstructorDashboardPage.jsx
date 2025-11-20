@@ -1,21 +1,43 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Navbar from "../../components/Navbar";
 import CreateCourseForm from "../../components/CreateCourseForm";
 import CourseList from "../../components/CourseList";
-import { createCourse } from "../../service/course.js";
+import { createCourse, getInstructorCourses } from "../../service/course.js";
 
 function InstructorDashboardPage() {
   const [showCreateForm, setShowCreateForm] = useState(false);
-  const [courses] = useState([]);
+  const [courses, setCourses] = useState([]);
   const [totalStudents] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const totalCourses = courses.length;
+
+  useEffect(() => {
+    fetchCourses();
+  }, []);
+
+  const fetchCourses = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const data = await getInstructorCourses();
+      // Backend returns { course: [...] } (singular "course")
+      setCourses(data.course || []);
+    } catch (err) {
+      setError(err.message);
+      console.error("Failed to fetch courses:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleCreateCourse = async (courseData) => {
     try {
       await createCourse(courseData);
       setShowCreateForm(false);
-      // TODO: Refresh courses list after successful creation
+      // Refresh courses list after successful creation
+      await fetchCourses();
     } catch (error) {
       throw error; // Let CreateCourseForm handle the error display
     }
@@ -61,7 +83,23 @@ function InstructorDashboardPage() {
           />
         )}
 
-        <CourseList courses={courses} />
+        {loading ? (
+          <div className="text-center py-12">
+            <p className="text-gray-600">Loading courses...</p>
+          </div>
+        ) : error ? (
+          <div className="text-center py-12">
+            <p className="text-red-600">Error: {error}</p>
+            <button
+              onClick={fetchCourses}
+              className="mt-4 bg-black text-white px-4 py-2 rounded hover:bg-gray-800"
+            >
+              Retry
+            </button>
+          </div>
+        ) : (
+          <CourseList courses={courses} />
+        )}
       </main>
     </div>
   );

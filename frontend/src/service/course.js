@@ -33,3 +33,47 @@ export async function createCourse(courseData) {
 
   return data;
 }
+
+// Get all courses created by the instructor (requires auth + instructor role)
+export async function getInstructorCourses() {
+  const token = localStorage.getItem("token");
+
+  const response = await fetch(`${API_BASE_URL}/courses/created`, {
+    method: "GET",
+    headers: {
+      Authorization: token,
+    },
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.error || "Failed to fetch instructor courses");
+  }
+
+  return data;
+}
+
+// Get a single course by ID (public)
+export async function getCourseById(courseId) {
+  const response = await fetch(`${API_BASE_URL}/courses/${courseId}`);
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.error || "Failed to fetch course");
+  }
+
+  return data.course;
+}
+
+// Get lessons for a course (public)
+export async function getCourseLessons(courseId) {
+  const response = await fetch(`${API_BASE_URL}/courses/${courseId}/lessons`);
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.error || "Failed to fetch course lessons");
+  }
+
+  return data.lessons;
+}

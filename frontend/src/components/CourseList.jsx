@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 function CourseList({ courses = [] }) {
   return (
     <div className="border border-gray-300 rounded p-6">
@@ -11,7 +13,7 @@ function CourseList({ courses = [] }) {
           {courses.map((course) => (
             <div
               key={course.id}
-              className="border border-gray-300 rounded-lg p-6 hover:shadow-md transition-shadow bg-white"
+              className="border border-gray-300 rounded-lg p-6 hover:shadow-md transition-shadow bg-white flex flex-col"
             >
               <div className="mb-4">
                 <span className="inline-block bg-gray-100 text-gray-700 text-xs font-medium px-3 py-1 rounded">
@@ -21,9 +23,18 @@ function CourseList({ courses = [] }) {
               <h3 className="text-lg font-semibold mb-3 text-gray-900">
                 {course.title}
               </h3>
-              <p className="text-gray-600 text-sm mb-6 line-clamp-3">
+              <p className="text-gray-600 text-sm mb-6 line-clamp-3 grow">
                 {course.description}
               </p>
+              <div className="pt-4 border-t border-gray-200 mt-auto">
+                <Link
+                  to={`/courses/${course.id}`}
+                  className="text-black hover:underline text-sm font-medium cursor-pointer flex items-center gap-1"
+                >
+                  View Course
+                  <span>→</span>
+                </Link>
+              </div>
             </div>
           ))}
         </div>
