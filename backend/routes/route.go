@@ -8,25 +8,25 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func RegisterRoutes(server *gin.Engine){
+func RegisterRoutes(server *gin.Engine) {
+	// Public routes
 	server.GET("/ping", func(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, gin.H{"message": "pong"})
 	})
 
-	// auth routes
 	server.POST("/auth/register", handlers.RegisterUser)
 	server.POST("/auth/login", handlers.LoginUser)
 
-	// general routes to everyone
 	server.GET("/courses", handlers.FetchAllCourses)
-	server.GET("/courses/:id", handlers.FetchCourse)
+	server.GET("/courses/:courseId", handlers.FetchCourse)
 
-	authenticate := server.Group("/")
-	authenticate.Use(middleware.Authenticate)
+	// Authenticated routes
+	authenticated := server.Group("/")
+	authenticated.Use(middleware.Authenticate)
 
-	authenticate.GET("/auth/me", handlers.GetUserProfile)
+	authenticated.GET("/auth/me", handlers.GetUserProfile)
 
-	// instructor-only course routes
+	// Instructor-only routes
 	instructorRoutes := server.Group("/courses")
 	instructorRoutes.Use(middleware.Authenticate)
 	instructorRoutes.Use(middleware.CheckInstructor)
@@ -34,7 +34,9 @@ func RegisterRoutes(server *gin.Engine){
 	instructorRoutes.POST("", handlers.CreateCourse)
 	instructorRoutes.PUT("/:courseId", handlers.UpdateCourse)
 	instructorRoutes.DELETE("/:courseId", handlers.DeleteCourse)
-
-	instructorRoutes.POST("/:courseId/lessons", handlers.CreateLesson)
 	instructorRoutes.GET("/created", handlers.GetAllCourseCreated)
+
+	// Lesson routes - nested under courses
+	instructorRoutes.POST("/:courseId/lessons", handlers.CreateLesson)
+	instructorRoutes.GET("/:courseId/lessons", handlers.FetchCourseLessons)
 }

@@ -14,6 +14,31 @@ type Lesson struct {
 	CreatedAt time.Time `json:"createdAt"`
 }
 
+func GetCourseLessons(courseId int64) ([]Lesson, error){
+	query := `
+		SELECT * FROM Lesson
+		WHERE "courseId" = $1
+	`
+
+	rows, err := config.Connection.Query(config.DbCtx, query, courseId)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var lessons []Lesson
+	for rows.Next() {
+		var lesson Lesson
+		err := rows.Scan(&lesson.Id, &lesson.CourseId, &lesson.Title, &lesson.Content, &lesson.CreatedAt)
+		if err != nil {
+			return nil, err
+		}
+
+		lessons = append(lessons, lesson)
+	}
+	return lessons, nil
+}
+
 func (lesson *Lesson) Create() error{
 	query := `	
 		INSERT INTO Lesson ("courseId", title, content)

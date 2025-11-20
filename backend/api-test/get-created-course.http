@@ -1,0 +1,2 @@
+GET http://localhost:8080/courses/created
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxvbkBnbWFpbC5jb20iLCJleHAiOjE3NjM0NDUwMjYsInJvbGUiOiJpbnN0cnVjdG9yIiwidXNlcklkIjozfQ.bKGecPccodv7FFO4Rjn9Jt9fVBC-Dig1E_CYM9MCjCg

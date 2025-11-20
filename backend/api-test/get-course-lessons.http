@@ -1,0 +1,2 @@
+GET http://localhost:8080/courses/2/lessons
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImpvaG5AZ21haWwuY29tIiwiZXhwIjoxNzYzNjEwODQ4LCJyb2xlIjoiaW5zdHJ1Y3RvciIsInVzZXJJZCI6MX0._qq5tB1GfVKTKGgx-uK2JTKnXno00AoXOIFjiA_Zprg
