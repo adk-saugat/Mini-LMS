@@ -46,5 +46,37 @@ export async function LoginUser(userData) {
 
 export function logout() {
   localStorage.removeItem("token");
-  localStorage.removeItem("userRole");
+}
+
+/**
+ * Decodes JWT token and extracts the user role
+ * @returns {string|null} The user role or null if token is invalid/missing
+ */
+export function getUserRole() {
+  try {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      return null;
+    }
+
+    // JWT format: header.payload.signature
+    // We only need the payload (middle part)
+    const parts = token.split(".");
+    if (parts.length !== 3) {
+      return null;
+    }
+
+    // Decode the payload (base64url)
+    const payload = parts[1];
+    // Replace URL-safe base64 characters and add padding if needed
+    const base64 = payload.replace(/-/g, "+").replace(/_/g, "/");
+    const paddedBase64 = base64 + "=".repeat((4 - (base64.length % 4)) % 4);
+    const decoded = atob(paddedBase64);
+    const claims = JSON.parse(decoded);
+
+    return claims.role || null;
+  } catch (error) {
+    console.error("Error decoding token:", error);
+    return null;
+  }
 }

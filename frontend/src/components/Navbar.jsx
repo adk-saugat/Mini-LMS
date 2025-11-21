@@ -1,22 +1,31 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { logout } from "../service/auth.js";
+import { logout, getUserRole } from "../service/auth.js";
 
 function Navbar() {
   const location = useLocation();
   const navigate = useNavigate();
-  const isDashboard =
-    location.pathname.includes("/instructor") ||
-    location.pathname.includes("/student");
+  const token = localStorage.getItem("token");
+  const isAuthenticated = !!token;
+  const role = getUserRole();
 
   const handleLogout = () => {
     logout();
     navigate("/");
   };
 
+  const getDashboardPath = () => {
+    if (role === "instructor") {
+      return "/instructor/dashboard";
+    } else if (role === "student") {
+      return "/student/dashboard";
+    }
+    return "/";
+  };
+
   return (
     <nav className="border-b px-6 py-4">
       <div className="flex justify-between items-center">
-        <Link className="text-2xl font-bold flex items-center gap-2">
+        <Link to="/" className="text-2xl font-bold flex items-center gap-2">
           <svg
             className="w-8 h-8 text-black"
             fill="none"
@@ -32,9 +41,15 @@ function Navbar() {
           </svg>
           <span>MiniLMS</span>
         </Link>
-        <div className="flex gap-4">
-          {isDashboard ? (
+        <div className="flex gap-4 items-center">
+          {isAuthenticated ? (
             <>
+              <Link
+                to={getDashboardPath()}
+                className="text-gray-600 hover:text-gray-900"
+              >
+                Dashboard
+              </Link>
               <Link
                 to="/profile"
                 className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center hover:bg-gray-300 transition-colors cursor-pointer"

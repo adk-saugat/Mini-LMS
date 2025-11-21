@@ -4,6 +4,7 @@ import LoginPage from "./routes/LoginPage";
 import RegisterPage from "./routes/RegisterPage";
 import BrowseCoursesPage from "./routes/BrowseCoursesPage";
 import CourseDetailPage from "./routes/CourseDetailPage";
+import LessonDetailPage from "./routes/LessonDetailPage";
 import StudentDashboardPage from "./routes/student/StudentDashboardPage";
 import InstructorDashboardPage from "./routes/instructor/InstructorDashboardPage";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -18,6 +19,10 @@ function App() {
 
       {/* Public course routes */}
       <Route path="/courses/:id" element={<CourseDetailPage />} />
+      <Route
+        path="/courses/:courseId/lessons/:lessonId"
+        element={<LessonDetailPage />}
+      />
 
       {/* Protected - Student only */}
       <Route

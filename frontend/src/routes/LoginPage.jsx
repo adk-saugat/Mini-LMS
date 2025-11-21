@@ -45,12 +45,9 @@ function LoginPage() {
         password: user.password,
       });
 
-      // Store token and role in localStorage
+      // Store token in localStorage
       if (data.token) {
         localStorage.setItem("token", data.token);
-      }
-      if (data.role) {
-        localStorage.setItem("userRole", data.role);
       }
 
       // Redirect based on role

@@ -1,7 +1,12 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
+import CourseHeader from "../components/CourseHeader";
+import LessonForm from "../components/LessonForm";
+import LessonCard from "../components/LessonCard";
 import { getCourseById, getCourseLessons } from "../service/course.js";
+import { getUserRole } from "../service/auth";
+import { useLessonForm } from "../hooks/useLessonForm.js";
 
 function CourseDetailPage() {
   const { id } = useParams();
@@ -11,25 +16,36 @@ function CourseDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const fetchLessons = async () => {
+    try {
+      const lessonsData = await getCourseLessons(id);
+      setLessons(lessonsData || []);
+    } catch (lessonsError) {
+      console.warn("Could not fetch lessons:", lessonsError.message);
+      setLessons([]);
+    }
+  };
+
+  const {
+    showForm: showLessonForm,
+    setShowForm: setShowLessonForm,
+    formData: lessonForm,
+    error: lessonError,
+    loading: lessonLoading,
+    handleFormChange: handleLessonFormChange,
+    handleSubmit: handleCreateLesson,
+    resetForm: resetLessonForm,
+  } = useLessonForm(id, fetchLessons);
+
   useEffect(() => {
     async function fetchCourseData() {
       try {
         setLoading(true);
         setError(null);
 
-        // Fetch course details
         const courseData = await getCourseById(id);
         setCourse(courseData);
-
-        // Fetch course lessons
-        try {
-          const lessonsData = await getCourseLessons(id);
-          setLessons(lessonsData || []);
-        } catch (lessonsError) {
-          // If lessons can't be fetched, set empty array
-          console.warn("Could not fetch lessons:", lessonsError.message);
-          setLessons([]);
-        }
+        await fetchLessons();
       } catch (err) {
         setError(err.message || "Failed to load course");
       } finally {
@@ -72,51 +88,54 @@ function CourseDetailPage() {
     );
   }
 
+  const isInstructor = getUserRole() === "instructor";
+
   return (
     <div className="min-h-screen bg-white flex flex-col">
       <Navbar />
       <main className="w-[1152px] mx-auto px-6 py-12 flex-1 flex flex-col min-h-[calc(100vh-80px)]">
-        {/* Back Button */}
-        <button
-          onClick={() => navigate(-1)}
-          className="mb-6 text-gray-600 hover:text-gray-900 transition-colors cursor-pointer"
-        >
-          <svg
-            className="w-6 h-6"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M10 19l-7-7m0 0l7-7m-7 7h18"
-            />
-          </svg>
-        </button>
-
-        {/* Course Header */}
-        <div className="mb-8">
-          <div className="mb-4">
-            <span className="inline-block bg-gray-100 text-gray-700 text-xs font-medium px-3 py-1 rounded">
-              {course.category}
-            </span>
-          </div>
-          <h1 className="text-4xl font-bold mb-4 text-gray-900">
-            {course.title}
-          </h1>
-          <p className="text-gray-600 text-lg mb-4">{course.description}</p>
-          <div className="text-sm text-gray-500">
-            Created on {new Date(course.createdAt).toLocaleDateString()}
-          </div>
-        </div>
+        <CourseHeader course={course} onBack={() => navigate(-1)} />
 
         {/* Lessons Section */}
         <div className="border-t border-gray-200 pt-8 flex-1 flex flex-col">
-          <h2 className="text-2xl font-semibold mb-6 text-gray-900">
-            Course Lessons
-          </h2>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-semibold text-gray-900">
+              Course Lessons
+            </h2>
+            {isInstructor && !showLessonForm && (
+              <button
+                className="bg-black text-white px-6 py-2 rounded hover:bg-gray-800 transition-colors cursor-pointer flex items-center gap-2"
+                onClick={() => setShowLessonForm(true)}
+              >
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 4v16m8-8H4"
+                  />
+                </svg>
+                Add Lesson
+              </button>
+            )}
+          </div>
+
+          {showLessonForm && isInstructor && (
+            <LessonForm
+              formData={lessonForm}
+              error={lessonError}
+              loading={lessonLoading}
+              onChange={handleLessonFormChange}
+              onSubmit={handleCreateLesson}
+              onCancel={resetLessonForm}
+            />
+          )}
+
           {lessons.length === 0 ? (
             <div className="flex-1 flex items-center justify-center">
               <p className="text-gray-600">
@@ -126,28 +145,12 @@ function CourseDetailPage() {
           ) : (
             <div className="space-y-4">
               {lessons.map((lesson, index) => (
-                <div
+                <LessonCard
                   key={lesson.id}
-                  className="border border-gray-300 rounded-lg p-6 hover:shadow-md transition-shadow bg-white"
-                >
-                  <div className="flex items-start gap-4">
-                    <div className="flex-shrink-0 w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-700 font-semibold">
-                      {index + 1}
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="text-xl font-semibold mb-2 text-gray-900">
-                        {lesson.title}
-                      </h3>
-                      <p className="text-gray-600 text-sm mb-3 whitespace-pre-wrap">
-                        {lesson.content}
-                      </p>
-                      <div className="text-xs text-gray-500">
-                        Created on{" "}
-                        {new Date(lesson.createdAt).toLocaleDateString()}
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                  lesson={lesson}
+                  index={index}
+                  courseId={id}
+                />
               ))}
             </div>
           )}

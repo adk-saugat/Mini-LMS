@@ -1,8 +1,9 @@
 import { Navigate } from "react-router-dom";
+import { getUserRole } from "../service/auth";
 
 function ProtectedRoute({ children, requiredRole }) {
   const token = localStorage.getItem("token");
-  const role = localStorage.getItem("userRole");
+  const role = getUserRole();
 
   // No token - redirect to login
   if (!token) {
