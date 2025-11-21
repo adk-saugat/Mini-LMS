@@ -10,6 +10,8 @@ require (
 
 require github.com/gin-contrib/cors v1.7.6
 
+require github.com/jackc/puddle/v2 v2.2.2 // indirect
+
 require (
 	github.com/bytedance/sonic v1.14.0 // indirect
 	github.com/bytedance/sonic/loader v0.3.0 // indirect

@@ -22,10 +22,11 @@ func GetCreatedCourse(instructorId int64) ([]Course, error){
 		WHERE "instructorId" = $1
 	`
 
-	rows, err := config.Connection.Query(config.DbCtx, query, instructorId)
+	rows, err := config.Pool.Query(config.DbCtx, query, instructorId)
 	if err != nil {
 		return nil, err
 	}
+	defer rows.Close()
 
 	var courses []Course
 	for rows.Next() {
@@ -35,9 +36,9 @@ func GetCreatedCourse(instructorId int64) ([]Course, error){
 			return nil, err
 		}
 		courses = append(courses, course)
-	}      
+	}
 
-	return courses, nil
+	return courses, rows.Err()
 
 }
 
@@ -48,7 +49,7 @@ func (course *Course) Update() error{
 		WHERE id = $4
 	`
 
-	_, err := config.Connection.Exec(config.DbCtx, query, course.Title, course.Description, course.Category, course.ID)
+	_, err := config.Pool.Exec(config.DbCtx, query, course.Title, course.Description, course.Category, course.ID)
 	if err != nil {
 		return err
 	}
@@ -62,7 +63,7 @@ func DeleteCourse(courseId, instructorId int64) (error){
 		WHERE id = $1 AND "instructorId" = $2
 	`
 
-	_, err := config.Connection.Exec(config.DbCtx, query, courseId, instructorId)
+	_, err := config.Pool.Exec(config.DbCtx, query, courseId, instructorId)
 	if err != nil {
 		return err
 	}
@@ -71,11 +72,12 @@ func DeleteCourse(courseId, instructorId int64) (error){
 
 func GetCourseById(courseId int64) (*Course, error){
 	query := `
-		SELECT * FROM Course
+		SELECT id, "instructorId", title, description, category, "createdAt"
+		FROM Course
 		WHERE id = $1
 	`
 
-	row := config.Connection.QueryRow(config.DbCtx, query, courseId)
+	row := config.Pool.QueryRow(config.DbCtx, query, courseId)
 
 	var course Course
 	err := row.Scan(&course.ID, &course.InstructorId, &course.Title, &course.Description, &course.Category, &course.CreatedAt)
@@ -96,10 +98,11 @@ func GetAllCourses(pageNumber int64) ([]Course, error){
 		OFFSET $2
 	`
 
-	rows, err := config.Connection.Query(config.DbCtx, query, limit, offset)
+	rows, err := config.Pool.Query(config.DbCtx, query, limit, offset)
 	if err != nil {
 		return nil, err
 	}
+	defer rows.Close()
 	
 	var courses []Course
 	for rows.Next() {
@@ -109,9 +112,9 @@ func GetAllCourses(pageNumber int64) ([]Course, error){
 			return nil, err
 		}
 		courses = append(courses, course)
-	}      
+	}
 
-	return courses, nil
+	return courses, rows.Err()
 }
 
 func (course *Course) CreateCourse() error{
@@ -120,7 +123,7 @@ func (course *Course) CreateCourse() error{
 		VALUES ($1, $2, $3, $4)
 	`
 
-	_, err := config.Connection.Exec(config.DbCtx, query, course.InstructorId, course.Title, course.Description, course.Category)
+	_, err := config.Pool.Exec(config.DbCtx, query, course.InstructorId, course.Title, course.Description, course.Category)
 	if err != nil {
 		return err
 	}

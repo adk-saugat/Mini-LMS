@@ -30,7 +30,7 @@ func (user *User) Register() error{
 		return errors.New("couldnot hash password")
 	}
 
-	err = config.Connection.QueryRow(config.DbCtx, query, user.FirstName, user.LastName, user.Email, hashedPassword, user.Role).Scan(&user.ID, &user.CreatedAt)
+	err = config.Pool.QueryRow(config.DbCtx, query, user.FirstName, user.LastName, user.Email, hashedPassword, user.Role).Scan(&user.ID, &user.CreatedAt)
 	if err != nil {
 		return err
 	}
@@ -45,7 +45,7 @@ func (user *User) ValidateCredential() error{
 		WHERE email = $1
 	`
 
-	row := config.Connection.QueryRow(config.DbCtx, query, user.Email)
+	row := config.Pool.QueryRow(config.DbCtx, query, user.Email)
 
 	var retrievedPassword string
 	err := row.Scan(&user.ID, &retrievedPassword, &user.Role)
@@ -68,7 +68,7 @@ func GetUserById(userId int64) (*User, error){
 		WHERE id = $1;
 	`
 
-	row := config.Connection.QueryRow(config.DbCtx, query, userId)
+	row := config.Pool.QueryRow(config.DbCtx, query, userId)
 	
 	var user User
 	err := row.Scan(&user.ID, &user.FirstName, &user.LastName, &user.Email, &user.Role, &user.CreatedAt)

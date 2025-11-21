@@ -108,7 +108,7 @@ func DeleteCourse(ctx *gin.Context) {
 }
 
 func FetchCourse(ctx *gin.Context){
-	courseId, err := strconv.ParseInt(ctx.Param("id"), 10, 64)
+	courseId, err := strconv.ParseInt(ctx.Param("courseId"), 10, 64)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"error": "Could not parse parameters!",
@@ -119,7 +119,7 @@ func FetchCourse(ctx *gin.Context){
 	course, err := models.GetCourseById(courseId)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Could fetch course!",
+			"error": "Couldnot fetch course!",
 		})
 		return
 	}

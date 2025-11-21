@@ -4,10 +4,10 @@ import (
 	"context"
 	"os"
 
-	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-var Connection *pgx.Conn
+var Pool *pgxpool.Pool
 var DbCtx context.Context
 
 func InitializeDatabase(){
@@ -17,15 +17,14 @@ func InitializeDatabase(){
 		panic("unable to find database url")
 	}
 
-	// connect to database
+	// connect to database using connection pool
 	DbCtx = context.Background()
 
 	var err error
-	Connection, err = pgx.Connect(DbCtx, connString)
+	Pool, err = pgxpool.New(DbCtx, connString)
 	if err != nil {
 		panic("unable to connect to database: " + err.Error())
 	}
-
 
 	createTables()
 }
@@ -43,7 +42,7 @@ func createTables(){
 		) 
 	`
 
-	_, err := Connection.Exec(DbCtx, query)
+	_, err := Pool.Exec(DbCtx, query)
 	if err != nil {
 		panic("could not create table")
 	}
@@ -59,7 +58,7 @@ func createTables(){
 		)
 	`
 
-	_, err = Connection.Exec(DbCtx, query)
+	_, err = Pool.Exec(DbCtx, query)
 	if err != nil {
 		panic("could not create table")
 	}
@@ -69,12 +68,13 @@ func createTables(){
 			id SERIAL PRIMARY KEY,
 			"courseId" INTEGER NOT NULL REFERENCES Course(id),
 			title VARCHAR(100) NOT NULL,
+			overview TEXT,
 			content TEXT,
 			"createdAt" TIMESTAMP DEFAULT NOW()
 		)
 	`
 
-	_, err = Connection.Exec(DbCtx, query)
+	_, err = Pool.Exec(DbCtx, query)
 	if err != nil {
 		panic("could not create table")
 	}

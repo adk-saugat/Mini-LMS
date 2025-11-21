@@ -19,6 +19,7 @@ func RegisterRoutes(server *gin.Engine) {
 
 	server.GET("/courses", handlers.FetchAllCourses)
 	server.GET("/courses/:courseId", handlers.FetchCourse)
+	server.GET("/courses/:courseId/lessons", handlers.FetchCourseLessons)
 
 	// Authenticated routes
 	authenticated := server.Group("/")
@@ -36,7 +37,6 @@ func RegisterRoutes(server *gin.Engine) {
 	instructorRoutes.DELETE("/:courseId", handlers.DeleteCourse)
 	instructorRoutes.GET("/created", handlers.GetAllCourseCreated)
 
-	// Lesson routes - nested under courses
+	// Lesson routes - nested under courses (only POST requires instructor)
 	instructorRoutes.POST("/:courseId/lessons", handlers.CreateLesson)
-	instructorRoutes.GET("/:courseId/lessons", handlers.FetchCourseLessons)
 }
