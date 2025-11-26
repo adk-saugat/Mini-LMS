@@ -71,6 +71,8 @@ func GetUserProfile(ctx *gin.Context){
 
 	ctx.JSON(http.StatusOK, gin.H{"user": gin.H{
 		"id": user.ID,
+		"firstName": user.FirstName,
+		"lastName": user.LastName,
 		"name": user.FirstName + " " + user.LastName,
 		"email": user.Email,
 		"role": user.Role,

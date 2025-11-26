@@ -5,6 +5,7 @@ import RegisterPage from "./routes/RegisterPage";
 import BrowseCoursesPage from "./routes/BrowseCoursesPage";
 import CourseDetailPage from "./routes/CourseDetailPage";
 import LessonDetailPage from "./routes/LessonDetailPage";
+import ProfilePage from "./routes/ProfilePage";
 import StudentDashboardPage from "./routes/student/StudentDashboardPage";
 import InstructorDashboardPage from "./routes/instructor/InstructorDashboardPage";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -35,6 +36,14 @@ function App() {
       />
 
       {/* Protected Routes */}
+      <Route
+        path="/profile"
+        element={
+          <ProtectedRoute>
+            <ProfilePage />
+          </ProtectedRoute>
+        }
+      />
       <Route
         path="/student/dashboard"
         element={

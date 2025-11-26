@@ -215,3 +215,67 @@ func EditLesson(ctx *gin.Context) {
 		"message": "Lesson updated successfully!",
 	})
 }
+
+func DeleteLesson(ctx *gin.Context) {
+	courseIdStr := ctx.Param("courseId")
+	courseId, err := strconv.ParseInt(courseIdStr, 10, 64)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"error": "Could not parse courseId!",
+		})
+		return
+	}
+
+	lessonIdStr := ctx.Param("lessonId")
+	lessonId, err := strconv.ParseInt(lessonIdStr, 10, 64)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"error": "Could not parse lessonId!",
+		})
+		return
+	}
+
+	instructorId := ctx.GetInt64("userId")
+
+	course, err := models.GetCourseById(courseId)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Could not fetch course!",
+		})
+		return
+	}
+
+	if course.InstructorId != instructorId {
+		ctx.JSON(http.StatusUnauthorized, gin.H{
+			"error": "Not authorized to delete lesson!",
+		})
+		return
+	}
+
+	lesson, err := models.GetLessonById(lessonId)
+	if err != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{
+			"error": "Could not find lesson!",
+		})
+		return
+	}
+
+	if lesson.CourseId != courseId {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"error": "Lesson does not belong to this course!",
+		})
+		return
+	}
+
+	err = models.DeleteLesson(lessonId)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Could not delete lesson!",
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"message": "Lesson deleted successfully!",
+	})
+}

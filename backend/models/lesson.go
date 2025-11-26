@@ -111,3 +111,17 @@ func (lesson *Lesson) Update() error {
 
 	return nil
 }
+
+func DeleteLesson(lessonId int64) error {
+	query := `
+		DELETE FROM Lesson
+		WHERE id = $1
+	`
+
+	_, err := config.Pool.Exec(config.DbCtx, query, lessonId)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

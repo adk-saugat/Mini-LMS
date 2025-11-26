@@ -5,7 +5,7 @@ import Navbar from "../components/Navbar";
 import LessonHeader from "../components/LessonHeader";
 import LessonForm from "../components/LessonForm";
 import { getCourseById, getCourseLessons } from "../service/course.js";
-import { updateLesson } from "../service/lesson.js";
+import { updateLesson, deleteLesson } from "../service/lesson.js";
 import { getUserRole, getUserProfile } from "../service/auth.js";
 
 function LessonDetailPage() {
@@ -24,6 +24,7 @@ function LessonDetailPage() {
   });
   const [editError, setEditError] = useState(null);
   const [editLoading, setEditLoading] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     async function fetchData() {
@@ -152,6 +153,26 @@ function LessonDetailPage() {
     }
   };
 
+  const handleDelete = async () => {
+    if (
+      !window.confirm(
+        `Are you sure you want to delete "${lesson.title}"? This action cannot be undone.`
+      )
+    ) {
+      return;
+    }
+
+    try {
+      setIsDeleting(true);
+      await deleteLesson(courseId, lessonId);
+      // Navigate back to course detail page after successful deletion
+      navigate(`/courses/${courseId}`);
+    } catch (err) {
+      alert(err.message || "Failed to delete lesson");
+      setIsDeleting(false);
+    }
+  };
+
   if (error || !lesson || !course) {
     return (
       <div className="min-h-screen bg-white flex flex-col">
@@ -181,7 +202,9 @@ function LessonDetailPage() {
             course={course}
             onBack={() => navigate(-1)}
             onEdit={handleEdit}
-            showEdit={isInstructor}
+            onDelete={handleDelete}
+            showEdit={isInstructor && !isDeleting}
+            showDelete={isInstructor && !isDeleting}
           />
         )}
 
