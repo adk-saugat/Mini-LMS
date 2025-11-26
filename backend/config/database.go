@@ -78,4 +78,19 @@ func createTables(){
 	if err != nil {
 		panic("could not create table")
 	}
+
+	query = `
+		CREATE TABLE IF NOT EXISTS Enrollment (
+			id SERIAL PRIMARY KEY,
+			"studentId" INTEGER NOT NULL REFERENCES "User"(id),
+			"courseId" INTEGER NOT NULL REFERENCES Course(id),
+			"enrolledAt" TIMESTAMP DEFAULT NOW(),
+			UNIQUE ("studentId", "courseId")
+		)
+	`
+
+	_, err = Pool.Exec(DbCtx, query)
+	if err != nil {
+		panic("could not create table")
+	}
 }

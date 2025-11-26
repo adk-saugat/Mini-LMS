@@ -27,6 +27,12 @@ func RegisterRoutes(server *gin.Engine) {
 
 	authenticated.GET("/auth/me", handlers.GetUserProfile)
 
+	// Enrollment routes - for students
+	authenticated.POST("/courses/:courseId/enroll", handlers.EnrollInCourse)
+	authenticated.GET("/courses/:courseId/enroll", handlers.CheckEnrollment)
+	authenticated.GET("/enrollments", handlers.GetStudentEnrollments)
+	authenticated.GET("/enrollments/courses", handlers.GetStudentEnrolledCourses)
+
 	// Instructor-only routes
 	instructorRoutes := server.Group("/courses")
 	instructorRoutes.Use(middleware.Authenticate)
@@ -36,6 +42,7 @@ func RegisterRoutes(server *gin.Engine) {
 	instructorRoutes.PUT("/:courseId", handlers.UpdateCourse)
 	instructorRoutes.DELETE("/:courseId", handlers.DeleteCourse)
 	instructorRoutes.GET("/created", handlers.GetAllCourseCreated)
+	instructorRoutes.GET("/students/total", handlers.GetTotalStudentsEnrolled)
 
 	// Lesson routes - nested under courses (only POST requires instructor)
 	instructorRoutes.POST("/:courseId/lessons", handlers.CreateLesson)

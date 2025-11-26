@@ -177,3 +177,19 @@ func CreateCourse(ctx *gin.Context){
 		"message": "Course created successfully!",
 	})
 }
+
+func GetTotalStudentsEnrolled(ctx *gin.Context) {
+	instructorId := ctx.GetInt64("userId")
+
+	totalStudents, err := models.GetTotalStudentsEnrolled(instructorId)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Could not fetch total students enrolled!",
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"totalStudents": totalStudents,
+	})
+}

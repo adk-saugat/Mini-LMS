@@ -119,3 +119,28 @@ export async function deleteCourse(courseId) {
 
   return data;
 }
+
+// Get total students enrolled across all instructor's courses (requires auth + instructor role)
+export async function getTotalStudentsEnrolled() {
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+    throw new Error("Authentication required. Please login first.");
+  }
+
+  const response = await fetch(`${API_BASE_URL}/courses/students/total`, {
+    method: "GET",
+    headers: {
+      Authorization: token,
+      "Content-Type": "application/json",
+    },
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.error || "Failed to fetch total students enrolled");
+  }
+
+  return data.totalStudents || 0;
+}

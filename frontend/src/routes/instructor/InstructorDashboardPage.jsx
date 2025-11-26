@@ -2,12 +2,16 @@ import { useState, useEffect } from "react";
 import Navbar from "../../components/Navbar";
 import CreateCourseForm from "../../components/CreateCourseForm";
 import CourseList from "../../components/CourseList";
-import { createCourse, getInstructorCourses } from "../../service/course.js";
+import {
+  createCourse,
+  getInstructorCourses,
+  getTotalStudentsEnrolled,
+} from "../../service/course.js";
 
 function InstructorDashboardPage() {
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [courses, setCourses] = useState([]);
-  const [totalStudents] = useState(0);
+  const [totalStudents, setTotalStudents] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -24,6 +28,16 @@ function InstructorDashboardPage() {
       const data = await getInstructorCourses();
       // Backend returns { course: [...] } (singular "course")
       setCourses(data.course || []);
+
+      // Fetch total students enrolled
+      try {
+        const total = await getTotalStudentsEnrolled();
+        setTotalStudents(total);
+      } catch (studentsError) {
+        console.warn("Failed to fetch total students:", studentsError);
+        // Don't fail the whole page if this fails
+        setTotalStudents(0);
+      }
     } catch (err) {
       setError(err.message);
       console.error("Failed to fetch courses:", err);
