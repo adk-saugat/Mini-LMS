@@ -4,7 +4,13 @@ import Navbar from "../components/Navbar";
 import CourseHeader from "../components/CourseHeader";
 import LessonForm from "../components/LessonForm";
 import LessonCard from "../components/LessonCard";
-import { getCourseById, getCourseLessons } from "../service/course.js";
+import EditCourseForm from "../components/EditCourseForm";
+import {
+  getCourseById,
+  getCourseLessons,
+  deleteCourse,
+  updateCourse,
+} from "../service/course.js";
 import { getUserRole } from "../service/auth";
 import { useLessonForm } from "../hooks/useLessonForm.js";
 
@@ -15,6 +21,8 @@ function CourseDetailPage() {
   const [lessons, setLessons] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [showEditForm, setShowEditForm] = useState(false);
 
   const fetchLessons = async () => {
     try {
@@ -90,14 +98,62 @@ function CourseDetailPage() {
 
   const isInstructor = getUserRole() === "instructor";
 
+  const handleDelete = async () => {
+    if (
+      !window.confirm(
+        `Are you sure you want to delete "${course.title}"? This action cannot be undone.`
+      )
+    ) {
+      return;
+    }
+
+    try {
+      setIsDeleting(true);
+      await deleteCourse(id);
+      // Navigate to instructor dashboard after successful deletion
+      navigate("/instructor/dashboard");
+    } catch (err) {
+      alert(err.message || "Failed to delete course");
+      setIsDeleting(false);
+    }
+  };
+
+  const handleUpdateCourse = async (courseData) => {
+    try {
+      await updateCourse(id, courseData);
+      // Refresh course data
+      const updatedCourse = await getCourseById(id);
+      setCourse(updatedCourse);
+      setShowEditForm(false);
+    } catch (err) {
+      throw err; // Let EditCourseForm handle the error display
+    }
+  };
+
   return (
     <div className="min-h-screen bg-white flex flex-col">
       <Navbar />
       <main className="w-[1152px] mx-auto px-6 py-12 flex-1 flex flex-col min-h-[calc(100vh-80px)]">
-        <CourseHeader course={course} onBack={() => navigate(-1)} />
+        <CourseHeader
+          course={course}
+          onBack={() => navigate(-1)}
+          onDelete={handleDelete}
+          onEdit={() => setShowEditForm(true)}
+          showDelete={isInstructor && !isDeleting && !showEditForm}
+          showEdit={isInstructor && !isDeleting && !showEditForm}
+        />
+
+        {showEditForm && isInstructor && (
+          <EditCourseForm
+            course={course}
+            onCancel={() => setShowEditForm(false)}
+            onSubmit={handleUpdateCourse}
+          />
+        )}
 
         {/* Lessons Section */}
-        <div className="border-t border-gray-200 pt-8 flex-1 flex flex-col">
+        {!showEditForm && (
+          <div className="border-t border-gray-200 pt-8 flex-1 flex flex-col">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-semibold text-gray-900">
               Course Lessons
@@ -154,7 +210,8 @@ function CourseDetailPage() {
               ))}
             </div>
           )}
-        </div>
+          </div>
+        )}
       </main>
     </div>
   );

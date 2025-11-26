@@ -46,7 +46,7 @@ func LoginUser(ctx *gin.Context){
 		return
 	}
 
-	token, err := utils.GenerateToken(user.ID, user.Email, user.Role)
+	token, err := utils.GenerateToken(user.ID, user.Email, user.Role, user.FirstName, user.LastName)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Couldnot generate token!"})
 		return

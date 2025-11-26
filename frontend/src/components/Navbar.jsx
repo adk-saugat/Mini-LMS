@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { logout, getUserRole } from "../service/auth.js";
+import { logout, getUserRole, getUserName } from "../service/auth.js";
 
 function Navbar() {
   const location = useLocation();
@@ -7,6 +7,7 @@ function Navbar() {
   const token = localStorage.getItem("token");
   const isAuthenticated = !!token;
   const role = getUserRole();
+  const userName = getUserName();
 
   const handleLogout = () => {
     logout();
@@ -25,7 +26,10 @@ function Navbar() {
   return (
     <nav className="border-b px-6 py-4">
       <div className="flex justify-between items-center">
-        <Link to="/" className="text-2xl font-bold flex items-center gap-2">
+        <Link 
+          to={isAuthenticated ? getDashboardPath() : "/"} 
+          className="text-2xl font-bold flex items-center gap-2"
+        >
           <svg
             className="w-8 h-8 text-black"
             fill="none"
@@ -44,12 +48,9 @@ function Navbar() {
         <div className="flex gap-4 items-center">
           {isAuthenticated ? (
             <>
-              <Link
-                to={getDashboardPath()}
-                className="text-gray-600 hover:text-gray-900"
-              >
-                Dashboard
-              </Link>
+              <span className="text-gray-600">
+                {userName || "User"}
+              </span>
               <Link
                 to="/profile"
                 className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center hover:bg-gray-300 transition-colors cursor-pointer"

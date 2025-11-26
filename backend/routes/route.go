@@ -39,4 +39,5 @@ func RegisterRoutes(server *gin.Engine) {
 
 	// Lesson routes - nested under courses (only POST requires instructor)
 	instructorRoutes.POST("/:courseId/lessons", handlers.CreateLesson)
+	instructorRoutes.PUT("/:courseId/lessons/:lessonId", handlers.EditLesson)
 }

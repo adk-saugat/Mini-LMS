@@ -48,6 +48,31 @@ func GetCourseLessons(courseId int64) ([]Lesson, error){
 	return lessons, rows.Err()
 }
 
+func GetLessonById(lessonId int64) (*Lesson, error) {
+	query := `
+		SELECT id, "courseId", title, overview, content, "createdAt"
+		FROM Lesson
+		WHERE id = $1
+	`
+
+	row := config.Pool.QueryRow(config.DbCtx, query, lessonId)
+
+	var lesson Lesson
+	err := row.Scan(
+		&lesson.Id,
+		&lesson.CourseId,
+		&lesson.Title,
+		&lesson.Overview,
+		&lesson.Content,
+		&lesson.CreatedAt,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &lesson, nil
+}
+
 func (lesson *Lesson) Create() error{
 	query := `	
 		INSERT INTO Lesson ("courseId", title, overview, content)
@@ -59,6 +84,26 @@ func (lesson *Lesson) Create() error{
 		lesson.Title,
 		lesson.Overview,
 		lesson.Content,
+	)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (lesson *Lesson) Update() error {
+	query := `
+		UPDATE Lesson
+		SET title = $1, overview = $2, content = $3
+		WHERE id = $4
+	`
+
+	_, err := config.Pool.Exec(config.DbCtx, query,
+		lesson.Title,
+		lesson.Overview,
+		lesson.Content,
+		lesson.Id,
 	)
 	if err != nil {
 		return err

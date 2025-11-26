@@ -77,3 +77,45 @@ export async function getCourseLessons(courseId) {
 
   return data.lessons;
 }
+
+// Update a course (requires auth + instructor role)
+export async function updateCourse(courseId, courseData) {
+  const token = localStorage.getItem("token");
+
+  const response = await fetch(`${API_BASE_URL}/courses/${courseId}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: token,
+    },
+    body: JSON.stringify(courseData),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.error || "Failed to update course");
+  }
+
+  return data;
+}
+
+// Delete a course (requires auth + instructor role)
+export async function deleteCourse(courseId) {
+  const token = localStorage.getItem("token");
+
+  const response = await fetch(`${API_BASE_URL}/courses/${courseId}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: token,
+    },
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.error || "Failed to delete course");
+  }
+
+  return data;
+}

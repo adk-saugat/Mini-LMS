@@ -40,7 +40,7 @@ func (user *User) Register() error{
 
 func (user *User) ValidateCredential() error{
 	query := `
-		SELECT id, password, role
+		SELECT id, "firstName", "lastName", password, role
 		FROM "User"
 		WHERE email = $1
 	`
@@ -48,7 +48,7 @@ func (user *User) ValidateCredential() error{
 	row := config.Pool.QueryRow(config.DbCtx, query, user.Email)
 
 	var retrievedPassword string
-	err := row.Scan(&user.ID, &retrievedPassword, &user.Role)
+	err := row.Scan(&user.ID, &user.FirstName, &user.LastName, &retrievedPassword, &user.Role)
 	if err != nil {
 		return err
 	}
