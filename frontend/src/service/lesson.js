@@ -1,4 +1,4 @@
-const API_BASE_URL = "http://localhost:8080";
+import API_BASE_URL from "../config/api.js";
 
 export async function createLesson(courseId, lessonData) {
   const token = localStorage.getItem("token");

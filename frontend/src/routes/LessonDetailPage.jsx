@@ -7,6 +7,7 @@ import LessonForm from "../components/LessonForm";
 import { getCourseById, getCourseLessons } from "../service/course.js";
 import { updateLesson, deleteLesson } from "../service/lesson.js";
 import { getUserRole, getUserProfile } from "../service/auth.js";
+import { checkEnrollment } from "../service/enrollment.js";
 
 function LessonDetailPage() {
   const { courseId, lessonId } = useParams();
@@ -25,6 +26,8 @@ function LessonDetailPage() {
   const [editError, setEditError] = useState(null);
   const [editLoading, setEditLoading] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isEnrolled, setIsEnrolled] = useState(false);
+  const [checkingEnrollment, setCheckingEnrollment] = useState(false);
 
   useEffect(() => {
     async function fetchData() {
@@ -55,6 +58,18 @@ function LessonDetailPage() {
           const user = await getUserProfile();
           if (user && user.id === courseData.instructorId) {
             setIsInstructor(true);
+          }
+        } else if (userRole === "student") {
+          // Check enrollment status for students
+          setCheckingEnrollment(true);
+          try {
+            const enrollmentData = await checkEnrollment(courseId);
+            setIsEnrolled(enrollmentData.enrolled || false);
+          } catch (err) {
+            console.error("Error checking enrollment:", err);
+            setIsEnrolled(false);
+          } finally {
+            setCheckingEnrollment(false);
           }
         }
       } catch (err) {
@@ -172,6 +187,65 @@ function LessonDetailPage() {
       setIsDeleting(false);
     }
   };
+
+  // Check if student is enrolled before showing lesson content
+  const userRole = getUserRole();
+  const isStudent = userRole === "student";
+
+  if (checkingEnrollment) {
+    return (
+      <div className="min-h-screen bg-white flex flex-col">
+        <Navbar />
+        <main className="w-[1152px] mx-auto px-6 py-12 flex-1">
+          <div className="py-12">
+            <p className="text-gray-600">Checking enrollment status...</p>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  // Block access for non-enrolled students
+  if (isStudent && !isEnrolled && !isInstructor) {
+    return (
+      <div className="min-h-screen bg-white flex flex-col">
+        <Navbar />
+        <main className="w-[1152px] mx-auto px-6 py-12 flex-1">
+          <div className="py-12">
+            <div className="border border-gray-300 rounded-lg p-8 bg-white">
+              <div className="text-center">
+                <svg
+                  className="w-16 h-16 text-gray-400 mx-auto mb-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                  />
+                </svg>
+                <h2 className="text-2xl font-semibold mb-2 text-gray-900">
+                  Access Restricted
+                </h2>
+                <p className="text-gray-600 mb-6">
+                  You need to enroll in this course to access lesson content.
+                </p>
+                <button
+                  onClick={() => navigate(`/courses/${courseId}`)}
+                  className="bg-black text-white px-6 py-2 rounded hover:bg-gray-800 transition-colors cursor-pointer"
+                >
+                  Go to Course Page
+                </button>
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+    );
+  }
 
   if (error || !lesson || !course) {
     return (

@@ -1,4 +1,4 @@
-const API_BASE_URL = "http://localhost:8080";
+import API_BASE_URL from "../config/api.js";
 
 export async function RegisterUser(userData) {
   try {
@@ -47,7 +47,6 @@ export async function LoginUser(userData) {
 export function logout() {
   localStorage.removeItem("token");
 }
-
 
 export async function getUserProfile() {
   try {

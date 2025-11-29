@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import CourseHeader from "../components/CourseHeader";
@@ -11,23 +11,42 @@ import {
   deleteCourse,
   updateCourse,
 } from "../service/course.js";
-import { enrollInCourse, checkEnrollment } from "../service/enrollment.js";
+import {
+  enrollInCourse,
+  checkEnrollment,
+  getCourseEnrolledStudentsCount,
+} from "../service/enrollment.js";
 import { getUserRole } from "../service/auth";
 import { useLessonForm } from "../hooks/useLessonForm.js";
 
 function CourseDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
+
+  // Consolidated state
   const [course, setCourse] = useState(null);
   const [lessons, setLessons] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [showEditForm, setShowEditForm] = useState(false);
-  const [isEnrolled, setIsEnrolled] = useState(false);
-  const [isEnrolling, setIsEnrolling] = useState(false);
-  const [enrollmentError, setEnrollmentError] = useState(null);
-  const [isStudent, setIsStudent] = useState(false);
+
+  // Combined enrollment state
+  const [enrollment, setEnrollment] = useState({
+    isEnrolled: false,
+    loading: false,
+    error: null,
+  });
+
+  // Combined role-based data
+  const [roleData, setRoleData] = useState({
+    studentsCount: 0,
+  });
+
+  // Memoize role to avoid repeated calls
+  const userRole = useMemo(() => getUserRole(), []);
+  const isInstructor = userRole === "instructor";
+  const isStudent = userRole === "student";
 
   const fetchLessons = async () => {
     try {
@@ -56,23 +75,46 @@ function CourseDetailPage() {
         setLoading(true);
         setError(null);
 
-        const courseData = await getCourseById(id);
-        setCourse(courseData);
-        await fetchLessons();
+        // Parallel fetch for better performance
+        const [courseData, lessonsData] = await Promise.all([
+          getCourseById(id),
+          getCourseLessons(id),
+        ]);
 
-        // Check if user is student and enrollment status
-        const role = getUserRole();
-        if (role === "student") {
-          setIsStudent(true);
-          try {
-            const enrollmentData = await checkEnrollment(id);
-            setIsEnrolled(enrollmentData.enrolled || false);
-          } catch (err) {
-            console.warn("Could not check enrollment status:", err);
-            setIsEnrolled(false);
-          }
-        } else {
-          setIsStudent(false);
+        setCourse(courseData);
+        setLessons(lessonsData || []);
+
+        // Parallel fetch role-specific data
+        const promises = [];
+
+        if (isStudent) {
+          promises.push(
+            checkEnrollment(id)
+              .then((data) => ({
+                type: "enrollment",
+                value: data.enrolled || false,
+              }))
+              .catch(() => ({ type: "enrollment", value: false }))
+          );
+        }
+
+        if (isInstructor) {
+          promises.push(
+            getCourseEnrolledStudentsCount(id)
+              .then((count) => ({ type: "studentsCount", value: count }))
+              .catch(() => ({ type: "studentsCount", value: 0 }))
+          );
+        }
+
+        if (promises.length > 0) {
+          const results = await Promise.all(promises);
+          results.forEach((result) => {
+            if (result.type === "enrollment") {
+              setEnrollment((prev) => ({ ...prev, isEnrolled: result.value }));
+            } else if (result.type === "studentsCount") {
+              setRoleData((prev) => ({ ...prev, studentsCount: result.value }));
+            }
+          });
         }
       } catch (err) {
         setError(err.message || "Failed to load course");
@@ -82,7 +124,7 @@ function CourseDetailPage() {
     }
 
     fetchCourseData();
-  }, [id]);
+  }, [id, isStudent, isInstructor]);
 
   if (loading) {
     return (
@@ -116,8 +158,6 @@ function CourseDetailPage() {
     );
   }
 
-  const isInstructor = getUserRole() === "instructor";
-
   const handleDelete = async () => {
     if (
       !window.confirm(
@@ -141,9 +181,17 @@ function CourseDetailPage() {
   const handleUpdateCourse = async (courseData) => {
     try {
       await updateCourse(id, courseData);
-      // Refresh course data
-      const updatedCourse = await getCourseById(id);
-      setCourse(updatedCourse);
+      // Refresh course data and students count in parallel
+      const promises = [getCourseById(id)];
+      if (isInstructor) {
+        promises.push(getCourseEnrolledStudentsCount(id));
+      }
+
+      const results = await Promise.all(promises);
+      setCourse(results[0]);
+      if (isInstructor && results[1] !== undefined) {
+        setRoleData((prev) => ({ ...prev, studentsCount: results[1] }));
+      }
       setShowEditForm(false);
     } catch (err) {
       throw err; // Let EditCourseForm handle the error display
@@ -152,14 +200,15 @@ function CourseDetailPage() {
 
   const handleEnroll = async () => {
     try {
-      setIsEnrolling(true);
-      setEnrollmentError(null);
+      setEnrollment((prev) => ({ ...prev, loading: true, error: null }));
       await enrollInCourse(id);
-      setIsEnrolled(true);
+      setEnrollment((prev) => ({ ...prev, isEnrolled: true, loading: false }));
     } catch (err) {
-      setEnrollmentError(err.message || "Failed to enroll in course");
-    } finally {
-      setIsEnrolling(false);
+      setEnrollment((prev) => ({
+        ...prev,
+        error: err.message || "Failed to enroll in course",
+        loading: false,
+      }));
     }
   };
 
@@ -176,15 +225,27 @@ function CourseDetailPage() {
           showEdit={isInstructor && !isDeleting && !showEditForm}
         />
 
+        {/* Enrolled Students Count for Instructors */}
+        {!showEditForm && isInstructor && (
+          <div className="mb-6">
+            <p className="text-gray-600">
+              <span className="font-semibold text-gray-900">
+                {roleData.studentsCount}
+              </span>{" "}
+              {roleData.studentsCount === 1 ? "student" : "students"} enrolled
+            </p>
+          </div>
+        )}
+
         {/* Enrollment Section for Students */}
         {!showEditForm && isStudent && (
           <div className="mb-6 border border-gray-300 rounded-lg p-6 bg-white">
-            {enrollmentError && (
+            {enrollment.error && (
               <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
-                {enrollmentError}
+                {enrollment.error}
               </div>
             )}
-            {isEnrolled ? (
+            {enrollment.isEnrolled ? (
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <svg
@@ -222,10 +283,10 @@ function CourseDetailPage() {
                 </div>
                 <button
                   onClick={handleEnroll}
-                  disabled={isEnrolling}
+                  disabled={enrollment.loading}
                   className="bg-black text-white px-6 py-2 rounded hover:bg-gray-800 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                 >
-                  {isEnrolling ? (
+                  {enrollment.loading ? (
                     <>
                       <svg
                         className="animate-spin h-5 w-5"
@@ -336,6 +397,7 @@ function CourseDetailPage() {
                     lesson={lesson}
                     index={index}
                     courseId={id}
+                    isEnrolled={enrollment.isEnrolled}
                   />
                 ))}
               </div>
