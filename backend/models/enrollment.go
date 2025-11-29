@@ -148,3 +148,19 @@ func GetTotalStudentsEnrolled(instructorId int64) (int, error) {
 	return totalStudents, nil
 }
 
+func GetCourseEnrolledStudentsCount(courseId int64) (int, error) {
+	query := `
+		SELECT COUNT(*)
+		FROM Enrollment
+		WHERE "courseId" = $1
+	`
+
+	var count int
+	err := config.Pool.QueryRow(config.DbCtx, query, courseId).Scan(&count)
+	if err != nil {
+		return 0, err
+	}
+
+	return count, nil
+}
+

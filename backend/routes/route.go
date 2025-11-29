@@ -43,6 +43,7 @@ func RegisterRoutes(server *gin.Engine) {
 	instructorRoutes.DELETE("/:courseId", handlers.DeleteCourse)
 	instructorRoutes.GET("/created", handlers.GetAllCourseCreated)
 	instructorRoutes.GET("/students/total", handlers.GetTotalStudentsEnrolled)
+	instructorRoutes.GET("/:courseId/students/count", handlers.GetCourseEnrolledStudentsCount)
 
 	// Lesson routes - nested under courses (only POST requires instructor)
 	instructorRoutes.POST("/:courseId/lessons", handlers.CreateLesson)

@@ -129,3 +129,44 @@ func GetStudentEnrolledCourses(ctx *gin.Context) {
 	})
 }
 
+func GetCourseEnrolledStudentsCount(ctx *gin.Context) {
+	courseIdStr := ctx.Param("courseId")
+	courseId, err := strconv.ParseInt(courseIdStr, 10, 64)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"error": "Could not parse courseId!",
+		})
+		return
+	}
+
+	instructorId := ctx.GetInt64("userId")
+
+	// Verify the course belongs to the instructor
+	course, err := models.GetCourseById(courseId)
+	if err != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{
+			"error": "Course not found!",
+		})
+		return
+	}
+
+	if course.InstructorId != instructorId {
+		ctx.JSON(http.StatusUnauthorized, gin.H{
+			"error": "Not authorized to view students for this course!",
+		})
+		return
+	}
+
+	count, err := models.GetCourseEnrolledStudentsCount(courseId)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Could not fetch enrolled students count!",
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"count": count,
+	})
+}
+
